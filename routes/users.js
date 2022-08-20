@@ -183,6 +183,7 @@ router.post('/signup', async (req, res) => {
                     author: response.user.username,
                 }
                 await db.get().collection('blogss').insertOne(newobj)
+                console.log(newobj);
             });
             //
             // db.get().collection('demoinstadata').insertOne(insta).then((response) => {
