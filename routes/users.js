@@ -3,7 +3,7 @@ var router = express.Router();
 var db = require('../connection')
 var ObjectId = require('mongodb').ObjectId
 var fun = require('../functions')
-const iwa = require('instagram-without-api-node');
+const iwa = require('../index');
 
 
 
