@@ -18,6 +18,7 @@ module.exports={
                 db.get().collection('users').insertOne(userdata).then((response)=>{
                     response.signupstatus = true
                     response.user = userdata
+                    
                     resolve(response)
                 })            
             }
@@ -26,7 +27,6 @@ module.exports={
     doLogin:(userdata)=>{
         return new Promise(async(resolve,reject)=>{
             let user= await db.get().collection('users').findOne({gmail:userdata.gmail})
-            
             let response = {}
             if (user) {
                 
@@ -39,6 +39,7 @@ module.exports={
                     console.log('login success');
                     response.loginstatus = true
                     response.user = user
+                    console.log(response);
                     resolve(response)
                 }
             }else{

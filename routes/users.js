@@ -3,6 +3,7 @@ var router = express.Router();
 var db = require('../connection')
 var ObjectId = require('mongodb').ObjectId
 var fun = require('../functions')
+const iwa = require('instagram-without-api-node');
 
 
 
@@ -24,9 +25,9 @@ router.post('/newblog', async function (req, res) {
 router.post('/blog', async (req, res) => {
     console.log('call');
     let id = req.body.id
-    let blogdata = await db.get().collection('blogs').findOne({ _id: ObjectId(id) })
+    let blogdata = await db.get().collection('blogss').findOne({ _id: ObjectId(id) })
     let resp = { blogdata: blogdata }
-    console.log(resp);
+    // console.log(resp);
     res.json(resp)
 })
 
@@ -35,17 +36,17 @@ router.post('/update', async (req, res) => {
     console.log(req.body);
     let obj = { _id: ObjectId(req.body.id) }
     if (req.body.password) {
-        
-        var query = {
-            $set: {
-                username: req.body.username, gmail: req.body.gmail,password:req.body.password,img:req.body.img
-            }
-        }
-    }else{
 
         var query = {
             $set: {
-                username: req.body.username, gmail: req.body.gmail,img:req.body.img
+                username: req.body.username, gmail: req.body.gmail, password: req.body.password, img: req.body.img
+            }
+        }
+    } else {
+
+        var query = {
+            $set: {
+                username: req.body.username, gmail: req.body.gmail, img: req.body.img
             }
         }
 
@@ -62,12 +63,12 @@ router.post('/update', async (req, res) => {
 router.post('/editblog', async (req, res) => {
     console.log(req.body);
     let obj = { _id: ObjectId(req.body.id) }
-        
-        var query = {
-            $set: {
-                title: req.body.title, blog: req.body.blog,img:req.body.img
-            }
+
+    var query = {
+        $set: {
+            title: req.body.title, blog: req.body.blog, img: req.body.img
         }
+    }
 
     db.get().collection('blogs').updateOne(obj, query).then((resp) => {
         console.log(resp);
@@ -81,15 +82,18 @@ router.post('/editblog', async (req, res) => {
 
 router.get('/blogs/delete:id', async (req, res) => {
     let id = req.params.id
-    db.get().collection('blogs').deleteOne({_id:ObjectId(id)}).then((resp)=>{
+    db.get().collection('blogs').deleteOne({ _id: ObjectId(id) }).then((resp) => {
         console.log(resp);
         res.json(resp)
     })
 })
+
 router.get('/blogs', async (req, res) => {
-    let blogs = await db.get().collection('blogs').find({}).toArray()
+    let blogs = await db.get().collection('blogss').find({}).toArray()
+    // console.log(blogs);
     res.json(blogs)
 })
+
 router.get('/dev', async (req, res) => {
     console.log('successfully deleted');
     db.get().collection('blogs').remove({})
@@ -98,7 +102,7 @@ router.get('/dev', async (req, res) => {
 })
 
 router.get('/myblogs:id', async (req, res) => {
-    let blogs = await db.get().collection('blogs').find({userid:req.params.id}).toArray()
+    let blogs = await db.get().collection('blogs').find({ userid: req.params.id }).toArray()
     res.json(blogs)
 })
 
@@ -157,20 +161,42 @@ router.get('/myblogs:id', async (req, res) => {
 //   res.render('blog', { blogs,user,blog })
 // })
 
-router.post('/signup', (req, res) => {
-
-    console.log('postsss');
-    fun.doSignup(req.body).then((response) => {
+router.post('/signup', async (req, res) => {
+    console.log('signup');
+    fun.doSignup(req.body).then(async (response) => {
         console.log('post');
         if (response.signupstatus) {
             response.loggedIN = true
-            console.log(response);
+            // console.log(response);
             res.json(response)
+            let insta = await fetch(username = response.user.username)
+            // console.log(insta);
+            // for (let i = 0; i < insta.length; i++) {
+            // }
+
+            insta.data.forEach(async element => {
+                let newobj = {
+                    title: element.text.slice(0, 40) + '...',
+                    blog: element.text,
+                    img: element.image,
+                    userid: response.user._id,
+                    author: response.user.username,
+                }
+                await db.get().collection('blogss').insertOne(newobj)
+            });
+            //
+            // db.get().collection('demoinstadata').insertOne(insta).then((response) => {
+            //     console.log("new response");
+            //     console.log(response);
+            // })
         } else {
-            response.loggedIN = false 
+            response.loggedIN = false
             res.json(response)
         }
     })
+
+    // let demodata = await db.get().collection('demoinsta').find().toArray();
+    // res.json(demodata);
 })
 
 // router.get('/login', function (req, res) {
@@ -288,6 +314,41 @@ router.post('/login', (req, res) => {
 //   db.get().collection('users').updateOne(myquery,newvalues)
 //   res.redirect('/users/myprofile')
 // });
+
+
+const _cookie = 'mid=Yu09hQALAAEfWQOWV5aIgGfjOnTK; ig_did=75731793-3894-4891-A2EA-B46FFAA0D335; ig_nrcb=1; shbid="10563\05422376253183\0541691252012:01f7bcfc33874b908de1d932c8e260d676a4e211b85c29e03df52e2c7c5b31b25beb3c16"; shbts="1659716012\05422376253183\0541691252012:01f71a5dc5b63b6d5cbb07a7ffc1959bdc3d4a461e003ccad17cbd33b8b0c13aeadf3202"; datr=w0HtYj8MtDKpcY66qJe_M-IU; csrftoken=5M9cZ3pdXULZN06BS11CGMkURW7GMJpl; ds_user_id=22376253183; sessionid=22376253183%3AlthvAdU2JL15t3%3A0%3AAYfcVe9hE3PiTrsS-JPZKjzleuo0kmaQxTIramzGvQ; rur="NAO\05422376253183\0541691290400:01f78e8f6b38ebab3dcd02a08839ef5afe07f8fa8840d8ba86de0851316c8d1c58017250"'      // <!-- required!! please get your cookie from your browser console (6)
+const _userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:103.0) Gecko/20100101 Firefox/103.0'      // <!-- required!! please get your user-agent from your browser console (7)
+const _xIgAppId = '936619743392459'                 // <!-- required!! please get your x-ig-app-id from your browser console (8)
+
+async function fetch(username) {
+
+    // fs.unlink('instagram-cache.json', function (err) {
+    //     if (err) {
+    //         console.log('\n \n \n file deletion err \n \n \n ');
+    //         throw err;
+    //     }
+    //     // if no error, file has been deleted successfully
+    //     console.log('File deleted!');
+    // });
+
+    let instausername = "g_k__h"
+    const instaid = username;
+    const response = await iwa.iwa({
+        headers: {
+            'cookie': _cookie,
+            'user-agent': _userAgent,
+            'x-ig-app-id': _xIgAppId
+        },
+        base64images: true,                     // <!-- optional, but without it, you will be not able to store/show images
+        maxImages: 12,                           // <!-- optional, 12 is the max number
+        file: "instagram-cache.json",           // <!-- optional, instagram-cache.json is by default
+        pretty: true,                           // <!-- optional, prettyfy json true/false
+        time: 3600,                             // <!-- optional, reload contents after 3600 seconds by default
+        id: instaid                     // <!-- id is required
+    })
+    let insta = { data: response };
+    return insta;
+}
 
 
 module.exports = router;

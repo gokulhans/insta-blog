@@ -34,9 +34,7 @@ const Login = () => {
         }else{
           localStorage.setItem('err',JSON.stringify(err))
           navigate('/login')
-
         }
-
       })
   }
 

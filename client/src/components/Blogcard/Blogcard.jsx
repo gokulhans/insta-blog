@@ -52,13 +52,17 @@ const Blogcard = ({ blog }) => {
       .then(data => {
         localStorage.setItem('myblog', JSON.stringify(data.blogdata))
         id = data.blogdata.title
+        console.log(data);
+        console.log(id);
         navigate(`/blog/${id}`)
       })
   }
 
+  var src = "halo"
+
   return (
     <figure className="mx-3 my-2 relative flex bg-white rounded-md md:p-0 my-1 shadow-md w-full h-24 sm:h-36 content-center">
-      <img className="w-24 h-auto md:w-48 md:h-auto rounded-none mx-auto object-cover" src={blog.img} alt="" width="384" height="512" />
+      <img className="w-24 h-auto md:w-48 md:h-auto rounded-none mx-auto object-cover" src={"data:image/jpg;base64," + blog.img} alt="" width="384" height="512" />
       <div className="px-2 sm:px-8 w-full flex flex-col text-left items-center justify-center">
         <blockquote>
           <button className="sm:text-[20px] text-sm font-medium hover:underline underline-offset-2 cursor-pointer focus:outline-none" value={blog._id} onClick={(e) => { FetchBlog(e) }}>
